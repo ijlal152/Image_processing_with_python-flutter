@@ -258,7 +258,7 @@ Wait for: `Server running on: http://127.0.0.1:5000`
 #### Terminal 2: Start Frontend
 
 ```bash
-cd image_enhancement_project
+cd Image_processing_with_python-flutter
 
 # macOS/Linux
 ./start_frontend.sh
@@ -286,7 +286,7 @@ Choose your target device and wait for the app to launch.
 
 ```bash
 git clone <repository-url>
-cd image_enhancement_project
+cd Image_processing_with_python-flutter
 ```
 
 ### 2. Backend Setup
@@ -659,7 +659,7 @@ curl -X POST http://127.0.0.1:5000/enhance_image \
 ## 📁 Project Structure
 
 ```
-image_enhancement_project/
+Image_processing_with_python-flutter/
 │
 ├── backend/                          # Flask backend server
 │   ├── app.py                       # Main Flask application
@@ -1445,7 +1445,7 @@ curl -X POST http://127.0.0.1:5000/enhance_image \
 ## 📁 Project Structure
 
 ```
-image_enhancement_project/
+Image_processing_with_python-flutter/
 ├── backend/
 │   ├── app.py                 # Flask application
 │   ├── image_processor.py     # Image enhancement logic
