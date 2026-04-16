@@ -244,7 +244,7 @@ graph LR
 #### Terminal 1: Start Backend
 
 ```bash
-cd image_enhancement_project
+cd Image_processing_with_python-flutter
 
 # macOS/Linux
 ./start_backend.sh
