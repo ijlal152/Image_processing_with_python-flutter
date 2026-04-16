@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Enhancement Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e4e4e7;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #a1a1aa;
+            font-size: 1.1rem;
+        }
+
+        .control-panel {
+            background: rgba(39, 39, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .method-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #e4e4e7;
+            font-size: 0.95rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(39, 39, 42, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #e4e4e7;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(39, 39, 42, 0.9);
+        }
+
+        option {
+            background: #27272a;
+            color: #e4e4e7;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enhance-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .enhance-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .enhance-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .clear-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .status.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            display: block;
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            display: block;
+        }
+
+        .status.loading {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .image-card {
+            background: rgba(39, 39, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-card h3 {
+            margin-bottom: 15px;
+            color: #e4e4e7;
+            font-size: 1.3rem;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .download-btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 12px;
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+
+        .metrics-card {
+            background: rgba(39, 39, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .metrics-card h3 {
+            margin-bottom: 20px;
+            color: #e4e4e7;
+            font-size: 1.3rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-item {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #a1a1aa;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Image Enhancement Tool</h1>
+            <p class="subtitle">Advanced AI-powered image enhancement with multiple algorithms</p>
+        </header>
+
+        <div class="control-panel">
+            <div class="upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" id="imageInput" accept="image/*">
+                    <label for="imageInput" class="file-input-label">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Choose Image
+                    </label>
+                </div>
+                <div id="fileName" class="file-name" style="display: none;"></div>
+            </div>
+
+            <div class="method-section">
+                <label for="methodSelect">Enhancement Method:</label>
+                <select id="methodSelect">
+                    <option value="auto">Auto Enhancement - Multi-stage automatic enhancement</option>
+                    <option value="deblur">Deblur (Richardson-Lucy) - Superior deblurring</option>
+                    <option value="sharpen">Multi-Scale Sharpen - Advanced sharpening with edge protection</option>
+                    <option value="denoise">Advanced Denoise - Multi-stage noise reduction</option>
+                    <option value="enhance">Contrast Enhancement - Advanced brightness and tone mapping</option>
+                    <option value="super_resolution">Super Resolution - 2x upscaling with detail enhancement</option>
+                    <option value="hdr">HDR Tone Mapping - Better dynamic range</option>
+                    <option value="detail_enhance">Detail Enhancement - Frequency separation</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button id="enhanceBtn" class="enhance-btn" disabled>Enhance Image</button>
+                <button id="clearBtn" class="clear-btn">Clear</button>
+            </div>
+
+            <div id="status" class="status"></div>
+        </div>
+
+        <div id="resultsSection" class="results-section">
+            <div class="comparison-grid">
+                <div class="image-card">
+                    <h3>Original Image</h3>
+                    <div class="image-container">
+                        <img id="originalImage" src="" alt="Original">
+                    </div>
+                </div>
+                <div class="image-card">
+                    <h3>Enhanced Image</h3>
+                    <div class="image-container">
+                        <img id="enhancedImage" src="" alt="Enhanced">
+                    </div>
+                    <button id="downloadBtn" class="download-btn">Download Enhanced Image</button>
+                </div>
+            </div>
+
+            <div class="metrics-card">
+                <h3>Quality Metrics</h3>
+                <div class="metrics-grid" id="metricsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let enhancedImageData = null;
+
+        const imageInput = document.getElementById('imageInput');
+        const fileName = document.getElementById('fileName');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const status = document.getElementById('status');
+        const resultsSection = document.getElementById('resultsSection');
+        const originalImage = document.getElementById('originalImage');
+        const enhancedImage = document.getElementById('enhancedImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const metricsGrid = document.getElementById('metricsGrid');
+        const methodSelect = document.getElementById('methodSelect');
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                fileName.textContent = file.name;
+                fileName.style.display = 'block';
+                enhanceBtn.disabled = false;
+                
+                // Preview original image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    originalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                hideStatus();
+                resultsSection.classList.remove('active');
+            }
+        });
+
+        enhanceBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            formData.append('method', methodSelect.value);
+
+            showStatus('loading', 'Processing image... This may take a few seconds');
+            enhanceBtn.disabled = true;
+
+            try {
+                const response = await fetch('/enhance_image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    enhancedImageData = data.enhanced_image;
+                    enhancedImage.src = 'data:image/jpeg;base64,' + data.enhanced_image;
+                    displayMetrics(data.metrics);
+                    resultsSection.classList.add('active');
+                    showStatus('success', 'Image enhanced successfully!');
+                    setTimeout(hideStatus, 3000);
+                } else {
+                    showStatus('error', 'Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                showStatus('error', 'Network error: ' + error.message);
+            } finally {
+                enhanceBtn.disabled = false;
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            selectedFile = null;
+            imageInput.value = '';
+            fileName.style.display = 'none';
+            enhanceBtn.disabled = true;
+            resultsSection.classList.remove('active');
+            hideStatus();
+            originalImage.src = '';
+            enhancedImage.src = '';
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!enhancedImageData) return;
+
+            const link = document.createElement('a');
+            link.href = 'data:image/jpeg;base64,' + enhancedImageData;
+            link.download = 'enhanced_' + (selectedFile?.name || 'image.jpg');
+            link.click();
+        });
+
+        function showStatus(type, message) {
+            status.className = 'status ' + type;
+            if (type === 'loading') {
+                status.innerHTML = '<div class="spinner"></div><span>' + message + '</span>';
+            } else {
+                status.textContent = message;
+            }
+        }
+
+        function hideStatus() {
+            status.className = 'status';
+        }
+
+        function displayMetrics(metrics) {
+            metricsGrid.innerHTML = '';
+            
+            const metricsList = [
+                { label: 'PSNR', value: metrics.psnr?.toFixed(2) || 'N/A', unit: 'dB' },
+                { label: 'SSIM', value: metrics.ssim?.toFixed(4) || 'N/A', unit: '' },
+                { label: 'Original Sharpness', value: metrics.original_sharpness?.toFixed(2) || 'N/A', unit: '' },
+                { label: 'Enhanced Sharpness', value: metrics.enhanced_sharpness?.toFixed(2) || 'N/A', unit: '' },
+                { label: 'Improvement', value: metrics.sharpness_improvement?.toFixed(2) || 'N/A', unit: '%' }
+            ];
+
+            metricsList.forEach(metric => {
+                const metricItem = document.createElement('div');
+                metricItem.className = 'metric-item';
+                metricItem.innerHTML = `
+                    <div class="metric-label">${metric.label}</div>
+                    <div class="metric-value">${metric.value}${metric.unit}</div>
+                `;
+                metricsGrid.appendChild(metricItem);
+            });
+        }
+    </script>
+</body>
+</html>
